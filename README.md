@@ -66,8 +66,8 @@ optional arguments:
 
 
 ## Todo
-- [ ] id="select_server" deteceter
-- [x] add argparse
+* - [ ] id="select_server" deteceter
+* - [x] ~~add argparse~~
 
 
 ## Support
