@@ -124,7 +124,7 @@ class brute():
 
             if re.search("Cookies must be enabled past this point",site):
                   if args.verbosity >= 1:
-                      print "[-] Failed: PhpMyAdmin has cookies enabled\n"
+                      print "[-] Failed: PhpMyAdmin has cookies enabled"
                   break
 
             #Change this response if different. (language)
