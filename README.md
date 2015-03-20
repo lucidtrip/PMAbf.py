@@ -59,10 +59,8 @@ optional arguments:
 `python pmabf.py -u root -t 150 -T 10 -o pmabf.log -v 1 pma.pot wordlist.dic`
 
 ## Tested
-* Linux 2.6.32-042stab103.6 x86_64 GNU/Linux
-  * Python 2.7.3
-* Linux 2.6.32-042stab079.6 x86_64
-  * Python 2.7.3
+* Linux 2.6.32-042stab103.6 x86_64 GNU/Linux - Python 2.7.3
+* Linux 2.6.32-042stab079.6 x86_64 - Python 2.7.3
 
 
 ## Todo
@@ -72,4 +70,4 @@ optional arguments:
 
 ## Support
 You can support me for more useful tools and scripts with a litte donation
-* Bitcoin: coming soon
+* Bitcoin: 1H7YZLC1TzeA6qQVFHLtMMmDx8GsxLucid
