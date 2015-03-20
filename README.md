@@ -58,6 +58,12 @@ optional arguments:
 ## Exampels
 `python pmabf.py -u root -t 150 -T 10 -o pmabf.log -v 1 pma.pot wordlist.dic`
 
+pma.pot look like
+`http://localhost/pma/index.php
+http://127.0.0.1/phpmyadmin/index.php
+usw...
+`
+
 ## Tested
 * Linux 2.6.32-042stab103.6 x86_64 GNU/Linux - Python 2.7.3
 * Linux 2.6.32-042stab079.6 x86_64 - Python 2.7.3
